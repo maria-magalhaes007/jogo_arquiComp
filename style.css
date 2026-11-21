@@ -1,0 +1,280 @@
+﻿/* ==========================================================================
+   BYTE & THE LOST ARCHITECTURE — style.css
+   Base, componentes compartilhados, portal e JOGO 1.
+   Tema: claro, limpo — roxo, preto e verde.
+   (O jogo 2 fica em style-lab.css e usa os mesmos tokens daqui.)
+   ========================================================================== */
+
+/* ---------- 1. TOKENS (cores, fontes, medidas) ----------
+   Mude uma cor aqui e ela muda nos dois jogos. */
+:root {
+  --bg: #f6f2ff;
+  --surface: #ffffff;
+  --ink: #16101f;            /* preto arroxeado */
+  --ink-2: #2b2142;
+  --muted: #6c6584;
+  --text-dim: #6c6584;       /* nome antigo, ainda usado em alguns lugares */
+
+  --purple: #6d3fd9;
+  --purple-dark: #4a2aa6;
+  --purple-soft: #e8e0ff;
+  --purple-line: #cfc3f3;
+
+  --green: #1f9d63;
+  --green-dark: #157a4b;
+  --green-soft: #d9f5e6;
+  --green-bright: #3ddc97;   /* verde que aparece bem sobre fundo preto */
+
+  --danger: #d6336c;
+  --danger-soft: #fde2ec;
+
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 10px 30px rgba(45, 27, 105, 0.10);
+
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --font-paper: 'Courier Prime', 'Courier New', monospace;
+
+  /* cor de destaque: roxo no jogo 1, verde no jogo 2 (.theme-lab) */
+  --accent: var(--purple);
+  --accent-dark: var(--purple-dark);
+  --accent-soft: var(--purple-soft);
+}
+
+.theme-lab {
+  --accent: var(--green);
+  --accent-dark: var(--green-dark);
+  --accent-soft: var(--green-soft);
+}
+
+/* ---------- 2. BASE ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+h1, h2, h3, p { margin: 0; }
+.hidden { display: none !important; }
+.pixel { font-weight: 800; letter-spacing: 0.04em; }
+
+/* efeitos antigos de CRT: desligados */
+#scanlines, #vignette { display: none; }
+
+/* cada tela ocupa a janela inteira */
+.screen {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  overflow: hidden;
+}
+
+/* ---------- 3. BOTÕES (todos os tipos aqui, em um lugar só) ---------- */
+button {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 11px 18px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s, background 0.12s;
+}
+button:hover { transform: translateY(-1px); }
+button:active { transform: none; }
+button:focus-visible { outline: 3px solid var(--purple-line); outline-offset: 2px; }
+button:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+/* principal roxo (jogo 1) */
+.btn-neon, .btn-cyber { background: var(--purple); color: #fff; box-shadow: 0 6px 16px rgba(109, 63, 217, 0.28); }
+.btn-neon:hover, .btn-cyber:hover { background: var(--purple-dark); }
+
+/* principal verde (jogo 2 e confirmações) */
+.btn-atom, .btn-lab-green, .btn-success { background: var(--green); color: #fff; box-shadow: 0 6px 16px rgba(31, 157, 99, 0.28); }
+.btn-atom:hover, .btn-lab-green:hover, .btn-success:hover { background: var(--green-dark); }
+
+/* secundário (contorno) */
+.btn-ghost, .btn-lab-ghost { background: transparent; color: var(--ink-2); border-color: var(--purple-line); }
+.btn-ghost:hover, .btn-lab-ghost:hover { background: var(--purple-soft); }
+
+/* escuro (dica / ações de apoio) */
+.btn-warn, .btn-lab-amber { background: var(--ink); color: #fff; }
+.btn-warn:hover, .btn-lab-amber:hover { background: var(--ink-2); }
+
+/* pulso suave para chamar atenção */
+.btn-pulse { animation: pulsePurple 2.4s ease-out infinite; }
+.btn-atom.btn-pulse, .btn-lab-green.btn-pulse { animation-name: pulseGreen; }
+@keyframes pulsePurple { 0% { box-shadow: 0 0 0 0 rgba(109, 63, 217, 0.40); } 70%, 100% { box-shadow: 0 0 0 14px rgba(109, 63, 217, 0); } }
+@keyframes pulseGreen  { 0% { box-shadow: 0 0 0 0 rgba(31, 157, 99, 0.40); }  70%, 100% { box-shadow: 0 0 0 14px rgba(31, 157, 99, 0); } }
+
+/* ---------- 4. COMPONENTES COMPARTILHADOS ---------- */
+
+/* barra superior dos dois jogos */
+#topbar, #labTopbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px 20px;
+  padding: 12px 18px;
+  background: var(--surface);
+  border: 1px solid var(--purple-line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.hud-block, .lab-hud-block { display: flex; align-items: baseline; gap: 8px; }
+.hud-label, .lab-hud-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); }
+.hud-value, .lab-hud-value { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--accent-dark); }
+.hud-value.xp { color: var(--green-dark); }
+.hud-total, .lab-hud-total { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+#topbar .btn-ghost:first-of-type, #labTopbar .btn-lab-ghost { margin-left: auto; }
+
+/* cartões */
+.dialog-terminal, .modal-terminal, .final-card, .hub-card, .modal-content, .lab-fiche {
+  background: var(--surface);
+  border: 1px solid var(--purple-line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.term-title {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent-dark);
+}
+
+/* janela (modal) */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(22, 16, 31, 0.55);
+}
+.modal-content { width: min(720px, 100%); max-height: 85vh; overflow: auto; padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+.modal-title { font-size: 20px; color: var(--ink); }
+
+/* ---------- 5. PORTAL (HUB) ---------- */
+.hub-bg, .bg-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.hub-bg {
+  background-image:
+    linear-gradient(rgba(246, 242, 255, 0.70), rgba(246, 242, 255, 0.70)), /* véu claro por cima */
+    url(bg-mario.gif);                                                    /* o seu gif embaixo */
+  background-size: cover;       /* estica o gif para cobrir a tela toda, sem deixar vazios */
+  background-position: center;  /* centraliza a imagem */
+  background-repeat: no-repeat; /* não repete o gif em lado a lado */
+}
+.hub-content { position: relative; z-index: 1; width: min(980px, 100%); display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; }
+.hub-kicker { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; color: var(--purple-dark); }
+.hub-title { font-size: clamp(26px, 4.5vw, 44px); line-height: 1.1; color: var(--ink); }
+.hub-subtitle { max-width: 640px; color: var(--muted); }
+.hub-cards { width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 8px; }
+.hub-card { padding: 24px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; text-align: left; border-top: 5px solid var(--purple); }
+.hub-card:nth-child(2) { border-top-color: var(--green); }
+.hub-card-flag { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; padding: 4px 10px; border-radius: 999px; background: var(--purple-soft); color: var(--purple-dark); }
+.hub-card:nth-child(2) .hub-card-flag { background: var(--green-soft); color: var(--green-dark); }
+.hub-card-title { font-size: 22px; line-height: 1.2; }
+.hub-card-text { color: var(--muted); flex: 1; }
+.hub-footer { font-size: 12px; letter-spacing: 0.08em; color: var(--muted); }
+
+/* ---------- 6. JOGO 1: TELA INICIAL ---------- */
+.bg-grid { position: absolute; inset: 0; background-image: radial-gradient(var(--purple-line) 1.2px, transparent 1.2px); background-size: 26px 26px; opacity: 0.7; }
+.bg-neon { position: absolute; inset: 0; background: radial-gradient(circle at 50% 30%, rgba(109, 63, 217, 0.18), transparent 55%); }
+.bg-floor { position: absolute; left: 0; right: 0; bottom: 0; height: 28%; background: linear-gradient(to top, rgba(31, 157, 99, 0.18), transparent); }
+
+#screenStart > :not(.bg-scene) { position: relative; z-index: 1; }
+.btn-exit-top { position: absolute !important; top: 20px; left: 20px; }
+
+.dialog-terminal { width: min(680px, 100%); padding: 24px; display: grid; grid-template-columns: 1fr auto; gap: 14px 20px; align-items: center; }
+.dialog-terminal .term-title { grid-column: 1 / -1; }
+#byteDialog { display: flex; flex-direction: column; gap: 10px; }
+#byteCanvas { width: 112px; height: 112px; image-rendering: pixelated; background: var(--purple-soft); border-radius: var(--radius); }
+
+/* ---------- 7. JOGO 1: TUTORIAL ---------- */
+.modal-terminal { width: min(560px, 100%); padding: 28px; display: flex; flex-direction: column; gap: 16px; }
+.tutorial-content { display: flex; flex-direction: column; gap: 10px; }
+.tutorial-content p { padding: 10px 14px; border-left: 4px solid var(--purple); background: var(--purple-soft); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+
+/* ---------- 8. JOGO 1: PARTIDA ---------- */
+#screenGame { max-width: 1000px; margin: 0 auto; justify-content: flex-start; align-items: stretch; }
+
+#progressBar { display: flex; gap: 6px; flex: 1; max-width: 240px; }
+#progressBar .seg { flex: 1; height: 10px; border-radius: 999px; background: var(--purple-soft); transition: background 0.3s; }
+#progressBar .seg.filled { background: var(--green); }
+
+/* bancada (fundo preto para o holograma brilhar) */
+#benchArea { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px; background: var(--ink); border-radius: var(--radius); box-shadow: var(--shadow); }
+#hologram { width: 100%; max-width: 420px; height: auto; }
+#stageBanner { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; color: var(--green-bright); }
+
+#bottomPanel { display: flex; flex-direction: column; gap: 16px; padding: 20px; background: var(--surface); border: 1px solid var(--purple-line); border-radius: var(--radius); box-shadow: var(--shadow); }
+#challengeArea { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.cat-badge { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; padding: 4px 12px; border-radius: 999px; background: var(--purple-soft); color: var(--purple-dark); }
+#clueText { font-size: 18px; line-height: 1.5; }
+#answerInput { width: 100%; padding: 12px 14px; font-family: var(--font-mono); font-size: 18px; text-transform: uppercase; color: var(--ink); background: var(--bg); border: 2px solid var(--purple-line); border-radius: var(--radius-sm); outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+#answerInput:focus { border-color: var(--purple); box-shadow: 0 0 0 4px var(--purple-soft); }
+.error-box { width: 100%; padding: 10px 14px; font-size: 14px; font-weight: 600; color: var(--danger); background: var(--danger-soft); border-radius: var(--radius-sm); }
+
+#controlsArea { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+#recordNav { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+#recordLabel { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+
+/* console do BYTE */
+#byteConsole { height: 140px; overflow-y: auto; padding: 12px 14px; font-family: var(--font-mono); font-size: 13px; background: var(--ink); border-radius: var(--radius-sm); }
+.console-line { white-space: pre-wrap; margin-bottom: 4px; }
+.console-line.info { color: #cfc3f3; }
+.console-line.success { color: var(--green-bright); }
+.console-line.error { color: #ff7aa8; }
+.console-line.warn { color: #c4b5fd; font-weight: 700; }
+
+/* ---------- 9. JOGO 1: FINAL, BOOT E MANUAL ---------- */
+#bootScreen { width: min(560px, 100%); min-height: 320px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; background: var(--ink); border-radius: var(--radius); box-shadow: var(--shadow); }
+.boot-lines { font-family: var(--font-mono); font-size: 14px; color: var(--green-bright); }
+.boot-line { margin-bottom: 4px; }
+.boot-monitor { align-self: center; text-align: center; }
+.boot-logo { width: 72px; height: 72px; margin: 0 auto 8px; display: grid; place-items: center; font-size: 36px; font-weight: 800; color: #fff; background: var(--purple); border-radius: var(--radius); }
+.boot-sub { font-family: var(--font-mono); font-size: 12px; color: #cfc3f3; }
+
+#finalReport { width: min(560px, 100%); }
+.final-card { padding: 32px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; border-top: 5px solid var(--green); }
+.final-title { font-size: clamp(24px, 4vw, 34px); }
+.final-subtitle { font-size: 16px; font-weight: 600; color: var(--green-dark); }
+.final-stats { width: 100%; display: flex; flex-direction: column; gap: 8px; margin: 8px 0; }
+.stat { display: flex; justify-content: space-between; gap: 16px; padding: 10px 14px; background: var(--purple-soft); border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.stat span { font-family: var(--font-mono); font-weight: 700; color: var(--purple-dark); }
+
+#manualList { display: flex; flex-direction: column; gap: 10px; }
+.manual-item { padding: 12px 14px; border: 1px solid var(--purple-line); border-left: 5px solid var(--purple-line); border-radius: var(--radius-sm); }
+.manual-item.known { border-left-color: var(--green); background: var(--green-soft); }
+.manual-item.locked { opacity: 0.6; }
+.manual-term { font-family: var(--font-mono); font-size: 14px; font-weight: 700; }
+.manual-desc { font-size: 14px; color: var(--muted); }
+
+/* ---------- 10. RESPONSIVO E ACESSIBILIDADE ---------- */
+@media (max-width: 640px) {
+  .screen { padding: 14px; }
+  .dialog-terminal { grid-template-columns: 1fr; }
+  #byteCanvas { justify-self: center; }
+  #recordNav { margin-left: 0; width: 100%; justify-content: space-between; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

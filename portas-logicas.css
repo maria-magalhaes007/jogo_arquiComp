@@ -1,0 +1,239 @@
+/* ==========================================================================
+   PORTAS LÓGICAS — portas-logicas.css
+   Tema claro: roxo, preto e verde (mesmos tokens do restante do projeto).
+   ========================================================================== */
+
+/* ---------- 1. TOKENS ---------- */
+:root {
+  --bg: #f6f2ff;
+  --surface: #ffffff;
+  --ink: #16101f;
+  --ink-2: #2b2142;
+  --muted: #6c6584;
+
+  --purple: #6d3fd9;
+  --purple-dark: #4a2aa6;
+  --purple-soft: #e8e0ff;
+  --purple-line: #cfc3f3;
+
+  --green: #1f9d63;
+  --green-dark: #157a4b;
+  --green-soft: #d9f5e6;
+  --green-bright: #3ddc97;
+
+  --danger: #d6336c;
+  --danger-soft: #fde2ec;
+
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 10px 30px rgba(45, 27, 105, 0.10);
+
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+
+/* ---------- 2. BASE ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(109, 63, 217, 0.14), transparent 40%),
+    radial-gradient(circle at 95% 100%, rgba(31, 157, 99, 0.14), transparent 40%),
+    var(--bg);
+  min-height: 100vh;
+}
+h1, h2, p { margin: 0; }
+.hidden { display: none !important; }
+
+#app { max-width: 1240px; margin: 0 auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+
+.cartao { background: var(--surface); border: 1px solid var(--purple-line); border-radius: var(--radius); box-shadow: var(--shadow); }
+
+/* ---------- 3. BOTÕES ---------- */
+.btn {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  padding: 12px 22px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s, background 0.12s;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: none; }
+.btn:focus-visible { outline: 3px solid var(--purple-line); outline-offset: 2px; }
+.btn:disabled { opacity: 0.45; cursor: default; transform: none; box-shadow: none; }
+
+.btn-verde { background: var(--green); color: #fff; box-shadow: 0 6px 16px rgba(31, 157, 99, 0.28); }
+.btn-verde:hover:not(:disabled) { background: var(--green-dark); }
+.btn-roxo { background: var(--purple); color: #fff; box-shadow: 0 6px 16px rgba(109, 63, 217, 0.28); }
+.btn-roxo:hover { background: var(--purple-dark); }
+.btn-escuro { background: var(--ink); color: #fff; }
+.btn-escuro:hover { background: var(--ink-2); }
+.btn-ghost { background: transparent; color: var(--ink-2); border-color: var(--purple-line); padding: 9px 16px; font-size: 13px; }
+.btn-ghost:hover { background: var(--purple-soft); }
+
+.pulso { animation: pulso 2.2s ease-out infinite; }
+@keyframes pulso { 0% { box-shadow: 0 0 0 0 rgba(109, 63, 217, 0.45); } 70%, 100% { box-shadow: 0 0 0 14px rgba(109, 63, 217, 0); } }
+
+/* ---------- 4. TOPO ---------- */
+#topo { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; padding: 12px 18px; }
+.marca { font-weight: 800; letter-spacing: 0.08em; color: var(--ink); }
+.hud { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 18px; flex: 1; }
+.hud-bloco { display: flex; align-items: baseline; gap: 8px; }
+.hud-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); }
+.hud-valor { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--purple-dark); }
+.hud-total { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.progresso { width: 140px; height: 10px; background: var(--purple-soft); border-radius: 999px; overflow: hidden; }
+#progressoFill { height: 100%; width: 0; background: var(--green); border-radius: 999px; transition: width 0.4s; }
+.topo-acoes { display: flex; gap: 8px; margin-left: auto; }
+
+.selo-dif { padding: 4px 12px; font-size: 12px; font-weight: 700; border-radius: 999px; }
+.d1 { background: var(--green-soft); color: var(--green-dark); }
+.d2 { background: #e3f4d9; color: #3a7a1c; }
+.d3 { background: var(--purple-soft); color: var(--purple-dark); }
+.d4 { background: #d8c9fb; color: #3b1f8c; }
+.d5 { background: var(--ink); color: var(--green-bright); }
+
+/* ---------- 5. PALCO (circuito) ---------- */
+#palco { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+#circuitoWrap { overflow-x: auto; border-radius: var(--radius-sm); background:
+  radial-gradient(var(--purple-line) 1px, transparent 1px) 0 0 / 22px 22px, #fbf9ff; }
+#circuito { display: block; width: 100%; height: auto; margin: 0 auto; user-select: none; -webkit-user-select: none; }
+
+#mensagem { min-height: 44px; padding: 10px 14px; font-size: 15px; font-weight: 600; border-radius: var(--radius-sm); }
+#mensagem.info { background: var(--purple-soft); color: var(--purple-dark); }
+#mensagem.ok { background: var(--green-soft); color: var(--green-dark); }
+#mensagem.erro { background: var(--danger-soft); color: var(--danger); }
+
+/* --- fios --- */
+.fio { fill: none; stroke: var(--purple-line); stroke-width: 3; stroke-linecap: round; transition: stroke 0.25s; }
+.fio.v1 { stroke: var(--green); stroke-width: 4; filter: drop-shadow(0 0 3px rgba(61, 220, 151, 0.7)); }
+.fio.v0 { stroke: #8f86ab; stroke-width: 3; }
+
+/* --- chaves de entrada --- */
+.chave rect { fill: #fff; stroke: #8f86ab; stroke-width: 2; }
+.chave.on rect { fill: var(--green-soft); stroke: var(--green); }
+.chave-nome { font-family: var(--font-mono); font-size: 15px; font-weight: 700; fill: var(--ink); }
+.chave-valor { font-family: var(--font-mono); font-size: 15px; font-weight: 700; fill: #8f86ab; }
+.chave.on .chave-valor { fill: var(--green-dark); }
+
+/* --- lacunas e portas --- */
+.slot { touch-action: none; }
+.slot-caixa { fill: rgba(232, 224, 255, 0.55); stroke: var(--purple); stroke-width: 2; stroke-dasharray: 6 5; transition: fill 0.15s, stroke 0.15s; }
+.slot.ar1 .slot-caixa { fill: rgba(217, 245, 230, 0.7); stroke: var(--green); }
+.slot.vazio { cursor: pointer; }
+.slot.preenchido { cursor: grab; }
+.slot.preenchido .slot-caixa { fill: #fff; stroke: var(--purple-line); stroke-dasharray: none; }
+.slot.ar1.preenchido .slot-caixa { stroke: #a9dfc3; }
+.slot.ativo .slot-caixa { fill: var(--green-soft); stroke: var(--green); filter: drop-shadow(0 0 6px rgba(61, 220, 151, 0.8)); }
+.slot-interroga { font-family: var(--font-mono); font-size: 22px; font-weight: 700; fill: var(--purple); opacity: 0.55; pointer-events: none; }
+.slot.ar1 .slot-interroga { fill: var(--green); }
+.pino { fill: var(--purple); }
+.slot.ar1 .pino { fill: var(--green); }
+.gate-nome { font-family: var(--font-mono); font-size: 11px; font-weight: 700; fill: var(--muted); pointer-events: none; }
+
+.corpo { fill: #fff; stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
+.fio-gate { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; }
+.slot.ativo .corpo { fill: var(--green-soft); }
+
+.slot.compativel .slot-caixa { stroke-width: 3; animation: pisca 0.9s ease-in-out infinite; }
+.slot.incompativel { opacity: 0.35; }
+.slot.pegando { opacity: 0.35; }
+@keyframes pisca { 50% { fill: rgba(109, 63, 217, 0.28); } }
+.slot.recusa { animation: balanca 0.4s; }
+@keyframes balanca { 0%, 100% { transform: translate(var(--x, 0), 0); } 25% { opacity: 0.5; } 50% { opacity: 1; } 75% { opacity: 0.5; } }
+
+/* --- lâmpadas --- */
+.bulbo { fill: #ece8f5; stroke: #8f86ab; stroke-width: 3; }
+.halo { fill: none; }
+.filamento { fill: none; stroke: #8f86ab; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.lamp-nome { font-family: var(--font-mono); font-size: 11px; font-weight: 700; fill: var(--muted); }
+.lampada.acesa .bulbo { fill: var(--green-bright); stroke: var(--green-dark); }
+.lampada.acesa .halo { fill: rgba(61, 220, 151, 0.28); animation: brilho 1.4s ease-in-out infinite; }
+.lampada.acesa .filamento { stroke: var(--ink); }
+.lampada.falhou .bulbo { fill: var(--danger-soft); stroke: var(--danger); }
+.lampada.falhou .filamento { stroke: var(--danger); }
+@keyframes brilho { 50% { fill: rgba(61, 220, 151, 0.5); } }
+
+/* ---------- 6. BANDEJA ---------- */
+#bandeja { padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+.bandeja-topo { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
+.bandeja-topo h2 { font-size: 17px; }
+.legenda { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.chip { padding: 2px 10px; font-size: 12px; font-weight: 600; border-radius: 999px; }
+.chip-roxo { background: var(--purple-soft); color: var(--purple-dark); border: 1px dashed var(--purple); }
+.chip-verde { background: var(--green-soft); color: var(--green-dark); border: 1px dashed var(--green); }
+
+#inventario { display: flex; flex-wrap: wrap; gap: 12px; }
+.gate-card {
+  position: relative;
+  width: 124px;
+  padding: 12px 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+  background: #fff;
+  border: 2px solid var(--purple-line);
+  border-radius: var(--radius);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+}
+.gate-card:hover { transform: translateY(-2px); border-color: var(--purple); box-shadow: var(--shadow); }
+.gate-card.sel { border-color: var(--purple); box-shadow: 0 0 0 4px var(--purple-soft); }
+.gate-card strong { font-family: var(--font-mono); font-size: 14px; }
+.gate-card small { font-size: 11px; color: var(--muted); }
+.gate-qtd { position: absolute; top: 6px; right: 8px; padding: 0 8px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: #fff; background: var(--purple); border-radius: 999px; }
+.simbolo { width: 84px; height: 47px; pointer-events: none; }
+
+/* estoque zerado ou fase sem essa porta: cinza e bloqueada */
+.gate-card.zerado { filter: grayscale(1); opacity: 0.45; cursor: not-allowed; background: #f1eff6; }
+.gate-card.zerado:hover { transform: none; border-color: var(--purple-line); box-shadow: none; }
+.gate-card.zerado .gate-qtd { background: #8f86ab; }
+
+#acoes { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* porta "fantasma" durante o arraste */
+#fantasma { position: fixed; z-index: 200; width: 90px; pointer-events: none; transform: translate(-50%, -50%); filter: drop-shadow(0 8px 14px rgba(45, 27, 105, 0.35)); }
+#fantasma .simbolo { width: 90px; height: 50px; }
+
+/* ---------- 7. JANELAS ---------- */
+.modal { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(22, 16, 31, 0.55); }
+.modal-conteudo { width: min(640px, 100%); max-height: 88vh; overflow: auto; padding: 26px; display: flex; flex-direction: column; gap: 14px; background: var(--surface); border-radius: var(--radius); border-top: 5px solid var(--purple); }
+.modal-conteudo h2 { font-size: 22px; }
+.modal-sub { color: var(--muted); font-size: 14px; }
+.modal-botoes { display: flex; flex-wrap: wrap; gap: 10px; }
+.modal-fim { text-align: center; align-items: center; border-top-color: var(--green); }
+
+#gradeFases { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 10px; }
+.fase-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; font-family: var(--font-ui); background: #fff; border: 2px solid var(--purple-line); border-radius: var(--radius-sm); cursor: pointer; }
+.fase-btn:hover:not(:disabled) { border-color: var(--purple); background: var(--purple-soft); }
+.fase-btn:disabled { opacity: 0.5; cursor: default; background: #f1eff6; }
+.fase-btn.atual { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
+.fase-n { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--ink); }
+.fase-est { font-size: 12px; letter-spacing: 1px; color: var(--green-dark); }
+
+/* ---------- 8. RESPONSIVO ---------- */
+@media (max-width: 720px) {
+  #app { padding: 10px; }
+  .topo-acoes { margin-left: 0; }
+  .gate-card { width: calc(33.333% - 8px); min-width: 96px; }
+  .simbolo { width: 72px; height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

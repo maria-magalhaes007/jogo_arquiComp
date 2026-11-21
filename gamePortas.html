@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PORTAS LÓGICAS — 50 fases</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="portas-logicas.css">
+</head>
+<body>
+
+  <main id="app">
+
+    <!-- ===== TOPO: fase, dificuldade, tentativas, progresso ===== -->
+    <header id="topo" class="cartao">
+      <div class="marca">PORTAS LÓGICAS</div>
+
+      <div class="hud">
+        <div class="hud-bloco">
+          <span class="hud-label">FASE</span>
+          <span id="hudFase" class="hud-valor">01</span>
+          <span class="hud-total">/ 50</span>
+        </div>
+        <span id="hudDif" class="selo-dif">Muito fácil</span>
+        <div class="hud-bloco">
+          <span class="hud-label">TENTATIVAS</span>
+          <span id="hudTent" class="hud-valor">0</span>
+        </div>
+        <div class="progresso" title="Fases concluídas">
+          <div id="progressoFill"></div>
+        </div>
+        <span id="hudConcluidas" class="hud-total">0/50</span>
+      </div>
+
+      <div class="topo-acoes">
+        <button id="btnFases" class="btn btn-ghost" type="button">FASES</button>
+        <a class="btn btn-ghost" href="index.html">← PORTAL</a>
+      </div>
+    </header>
+
+    <!-- ===== PALCO: o circuito (desenhado pelo JS em SVG) ===== -->
+    <section id="palco" class="cartao">
+      <div id="circuitoWrap">
+        <svg id="circuito" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Circuito lógico da fase"></svg>
+      </div>
+      <div id="mensagem" role="status" aria-live="polite"></div>
+    </section>
+
+    <!-- ===== BANDEJA: inventário de portas e botões ===== -->
+    <section id="bandeja" class="cartao">
+      <div class="bandeja-topo">
+        <h2>Portas disponíveis</h2>
+        <p class="legenda">
+          Arraste (ou clique) uma porta até uma lacuna.
+          <span class="chip chip-roxo">lacuna roxa = 2 entradas</span>
+          <span class="chip chip-verde">lacuna verde = 1 entrada (só NOT)</span>
+        </p>
+      </div>
+
+      <div id="inventario"></div>
+
+      <div id="acoes">
+        <button id="btnIniciar" class="btn btn-verde" type="button">INICIAR</button>
+        <button id="btnResetar" class="btn btn-escuro" type="button">RESETAR</button>
+        <button id="btnProxima" class="btn btn-roxo pulso hidden" type="button">PRÓXIMA FASE</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- porta "fantasma" que acompanha o dedo/mouse durante o arraste -->
+  <div id="fantasma" class="hidden"></div>
+
+  <!-- ===== JANELA: escolher fase ===== -->
+  <div id="modalFases" class="modal hidden">
+    <div class="modal-conteudo">
+      <h2>Escolha a fase</h2>
+      <p class="modal-sub">As fases são liberadas em ordem. As estrelas mostram seu desempenho.</p>
+      <div id="gradeFases"></div>
+      <button id="btnFecharFases" class="btn btn-ghost" type="button">FECHAR</button>
+    </div>
+  </div>
+
+  <!-- ===== JANELA: fim do jogo ===== -->
+  <div id="modalFim" class="modal hidden">
+    <div class="modal-conteudo modal-fim">
+      <h2>Todas as 50 fases concluídas!</h2>
+      <p id="fimTexto" class="modal-sub"></p>
+      <div class="modal-botoes">
+        <button id="btnRecomecar" class="btn btn-roxo" type="button">JOGAR DE NOVO</button>
+        <button id="btnFecharFim" class="btn btn-ghost" type="button">FECHAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1º as fases (dados), 2º o motor do jogo -->
+  <script src="portas-fases.js"></script>
+  <script src="portas-logicas.js"></script>
+</body>
+</html>

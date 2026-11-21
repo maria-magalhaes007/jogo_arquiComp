@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Palavras Cruzadas</title>
+<style>
+  #cruzadinha { --tam: 40px; font-family: Arial, Helvetica, sans-serif; max-width: 900px; margin: 0 auto; padding: 16px; color: #222; }
+  #cruzadinha h1 { font-size: 24px; margin: 0 0 8px; }
+  #cruzadinha .layout { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+  #cruzadinha #grade { display: grid; gap: 2px; }
+  #cruzadinha .vazio { width: var(--tam); height: var(--tam); }
+  #cruzadinha .cel { position: relative; width: var(--tam); height: var(--tam); background: #fff; border: 1px solid #333; box-sizing: border-box; }
+  #cruzadinha .cel .num { position: absolute; top: 1px; left: 2px; font-size: 10px; line-height: 1; pointer-events: none; color: #444; }
+  #cruzadinha .cel input { width: 100%; height: 100%; border: 0; background: transparent; text-align: center; font-size: 20px; font-weight: bold; text-transform: uppercase; padding: 8px 0 0; box-sizing: border-box; outline: none; cursor: pointer; caret-color: transparent; }
+  #cruzadinha .cel.palavra { background: #dbeafe; }
+  #cruzadinha .cel.sel { background: #fde68a; }
+  #cruzadinha .cel.errado { background: #fecaca; }
+  #cruzadinha .cel.certo { background: #bbf7d0; }
+  #cruzadinha #dica-atual { min-height: 22px; font-weight: bold; margin: 8px 0 12px; }
+  #cruzadinha #dicas { flex: 1; min-width: 220px; }
+  #cruzadinha #dicas h2 { font-size: 16px; margin: 0 0 6px; }
+  #cruzadinha #dicas ol { list-style: none; padding: 0; margin: 0 0 16px; }
+  #cruzadinha #dicas li { padding: 4px 6px; cursor: pointer; border-radius: 4px; font-size: 14px; }
+  #cruzadinha #dicas li:hover { background: #f3f4f6; }
+  #cruzadinha #dicas li.ativa { background: #fde68a; }
+  #cruzadinha .botoes { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+  #cruzadinha button { padding: 8px 14px; font-size: 14px; cursor: pointer; border: 1px solid #333; background: #f3f4f6; border-radius: 4px; }
+  #cruzadinha #status { margin-top: 10px; min-height: 20px; font-size: 14px; }
+  #cruzadinha #status.erro { color: #b91c1c; }
+  #cruzadinha #status.ok { color: #15803d; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div id="cruzadinha">
+  <h1>Palavras Cruzadas</h1>
+  <div id="dica-atual"></div>
+  <div class="layout">
+    <div id="grade"></div>
+    <div id="dicas">
+      <h2>Horizontais</h2>
+      <ol id="dicas-h"></ol>
+      <h2>Verticais</h2>
+      <ol id="dicas-v"></ol>
+    </div>
+  </div>
+  <div class="botoes">
+    <button type="button" id="btn-verificar">Verificar</button>
+    <button type="button" id="btn-revelar">Revelar tudo</button>
+    <button type="button" id="btn-limpar">Limpar</button>
+  </div>
+  <div id="status"></div>
+</div>
+
+<script>
+/* ==========================================================================
+   COMO ADICIONAR OU ALTERAR PALAVRAS
+   --------------------------------------------------------------------------
+   Cada palavra é um bloco { ... } dentro da lista PALAVRAS abaixo:
+
+     resposta : a palavra (acentos e maiúsculas/minúsculas não importam)
+     dica     : o texto da dica
+     linha    : linha da PRIMEIRA letra (começa em 0, de cima para baixo)
+     coluna   : coluna da PRIMEIRA letra (começa em 0, da esquerda p/ direita)
+     direcao  : "H" = horizontal (→)   |   "V" = vertical (↓)
+
+   - O tamanho da grade e a numeração das dicas são calculados sozinhos.
+   - Onde duas palavras se cruzam, a letra precisa ser a mesma.
+     Se houver conflito, uma mensagem de erro aparece embaixo do jogo.
+   - Evite deixar letras de palavras diferentes lado a lado sem cruzar,
+     pois isso forma palavras "sem querer".
+   ========================================================================== */
+const PALAVRAS = [
+  // Horizontais
+  { resposta: "PROGRAMA", dica: "Conjunto de instruções executado pelo computador", linha: 2, coluna: 0, direcao: "H" },
+  { resposta: "DIAS",     dica: "Sete deles formam uma semana",                     linha: 5, coluna: 4, direcao: "H" },
+  { resposta: "NÃO",      dica: "Resposta contrária a \"sim\"",                     linha: 6, coluna: 0, direcao: "H" },
+  { resposta: "REDE",     dica: "Computadores conectados entre si",                 linha: 7, coluna: 4, direcao: "H" },
+
+  // Verticais
+  { resposta: "PÁGINA",   dica: "Cada tela de um site",                             linha: 2, coluna: 0, direcao: "V" },
+  { resposta: "CÓDIGO",   dica: "O que o programador escreve",                      linha: 1, coluna: 2, direcao: "V" },
+  { resposta: "SERVIDOR", dica: "Computador que hospeda um site",                   linha: 0, coluna: 4, direcao: "V" },
+  { resposta: "DADOS",    dica: "Informações armazenadas em um banco",              linha: 1, coluna: 7, direcao: "V" }
+];
+
+/* ==========================================================================
+   MOTOR DO JOGO (não precisa mexer daqui para baixo)
+   ========================================================================== */
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const norm = (s) => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z]/g, "").toUpperCase();
+
+  const cells = {};   // "linha,coluna" -> célula
+  const words = [];
+  const erros = [];
+
+  // 1) Monta as palavras e as células
+  PALAVRAS.forEach((p, i) => {
+    const resp = norm(p.resposta);
+    const dir = String(p.direcao || "").toUpperCase();
+    if (!resp || (dir !== "H" && dir !== "V") || !Number.isInteger(p.linha) || !Number.isInteger(p.coluna)) {
+      erros.push("Palavra #" + (i + 1) + " está com dados inválidos.");
+      return;
+    }
+    const w = { resp, dica: p.dica, dir, keys: [], num: 0 };
+    for (let k = 0; k < resp.length; k++) {
+      const r = p.linha + (dir === "V" ? k : 0);
+      const c = p.coluna + (dir === "H" ? k : 0);
+      const key = r + "," + c;
+      let cell = cells[key];
+      if (!cell) {
+        cell = cells[key] = { r, c, key, sol: resp[k], H: null, V: null, num: 0 };
+      } else if (cell.sol !== resp[k]) {
+        erros.push("Conflito na linha " + r + ", coluna " + c + ': "' + cell.sol + '" x "' + resp[k] + '" (palavra ' + p.resposta + ").");
+      }
+      if (cell[dir]) erros.push("Duas palavras na mesma direção se sobrepõem na linha " + r + ", coluna " + c + ".");
+      cell[dir] = w;
+      w.keys.push(key);
+    }
+    words.push(w);
+  });
+
+  const lista = Object.values(cells);
+  if (!lista.length) { $("status").textContent = "Nenhuma palavra válida configurada."; $("status").className = "erro"; return; }
+  const linhas = Math.max(...lista.map((c) => c.r)) + 1;
+  const colunas = Math.max(...lista.map((c) => c.c)) + 1;
+
+  // 2) Numeração automática (da esquerda p/ direita, de cima p/ baixo)
+  let n = 0;
+  for (let r = 0; r < linhas; r++) {
+    for (let c = 0; c < colunas; c++) {
+      const cell = cells[r + "," + c];
+      if (!cell) continue;
+      const comecaH = cell.H && cell.H.keys[0] === cell.key;
+      const comecaV = cell.V && cell.V.keys[0] === cell.key;
+      if (comecaH || comecaV) {
+        cell.num = ++n;
+        if (comecaH) cell.H.num = n;
+        if (comecaV) cell.V.num = n;
+      }
+    }
+  }
+
+  // 3) Desenha a grade
+  const grade = $("grade");
+  grade.style.gridTemplateColumns = "repeat(" + colunas + ", var(--tam))";
+  for (let r = 0; r < linhas; r++) {
+    for (let c = 0; c < colunas; c++) {
+      const cell = cells[r + "," + c];
+      if (!cell) {
+        const v = document.createElement("div");
+        v.className = "vazio";
+        grade.appendChild(v);
+        continue;
+      }
+      const el = document.createElement("div");
+      el.className = "cel";
+      if (cell.num) {
+        const s = document.createElement("span");
+        s.className = "num";
+        s.textContent = cell.num;
+        el.appendChild(s);
+      }
+      const inp = document.createElement("input");
+      inp.type = "text";
+      inp.autocomplete = "off";
+      inp.autocapitalize = "characters";
+      inp.spellcheck = false;
+      el.appendChild(inp);
+      grade.appendChild(el);
+      cell.el = el;
+      cell.input = inp;
+    }
+  }
+
+  // 4) Lista de dicas
+  const ordenadas = words.slice().sort((a, b) => a.num - b.num);
+  ordenadas.forEach((w) => {
+    const li = document.createElement("li");
+    li.innerHTML = "<b>" + w.num + ".</b> ";
+    li.appendChild(document.createTextNode(w.dica + " (" + w.resp.length + ")"));
+    li.addEventListener("click", () => selecionar(cells[w.keys[0]], w.dir));
+    $(w.dir === "H" ? "dicas-h" : "dicas-v").appendChild(li);
+    w.li = li;
+  });
+
+  // 5) Estado e seleção
+  let sel = null;
+  let dir = "H";
+
+  function atualizar() {
+    lista.forEach((c) => c.el.classList.remove("sel", "palavra"));
+    words.forEach((w) => w.li.classList.remove("ativa"));
+    const w = sel && sel[dir];
+    if (w) {
+      w.keys.forEach((k) => cells[k].el.classList.add("palavra"));
+      w.li.classList.add("ativa");
+      $("dica-atual").textContent = w.num + (w.dir === "H" ? " Horizontal" : " Vertical") + ": " + w.dica;
+    }
+    if (sel) sel.el.classList.add("sel");
+  }
+
+  function selecionar(cell, d, focar) {
+    if (d && cell[d]) dir = d;
+    else if (!cell[dir]) dir = dir === "H" ? "V" : "H";
+    sel = cell;
+    atualizar();
+    if (focar !== false) cell.input.focus();
+  }
+
+  function avancar() {
+    const w = sel[dir];
+    const i = w.keys.indexOf(sel.key);
+    if (i < w.keys.length - 1) selecionar(cells[w.keys[i + 1]], dir);
+  }
+
+  function retroceder() {
+    const w = sel[dir];
+    const i = w.keys.indexOf(sel.key);
+    if (i > 0) {
+      const ant = cells[w.keys[i - 1]];
+      limparCelula(ant);
+      selecionar(ant, dir);
+    }
+  }
+
+  function mover(dr, dc) {
+    let r = sel.r + dr, c = sel.c + dc;
+    while (r >= 0 && c >= 0 && r < linhas && c < colunas) {
+      const cell = cells[r + "," + c];
+      if (cell) { selecionar(cell, dr ? "V" : "H"); return; }
+      r += dr; c += dc;
+    }
+  }
+
+  function limparCelula(cell) {
+    cell.input.value = "";
+    cell.el.classList.remove("errado", "certo");
+  }
+
+  lista.forEach((cell) => {
+    cell.input.addEventListener("focus", () => { if (sel !== cell) selecionar(cell, null, false); });
+    cell.el.addEventListener("click", () => {
+      if (sel === cell) {
+        const outra = dir === "H" ? "V" : "H";
+        if (cell[outra]) { dir = outra; atualizar(); }
+      } else {
+        selecionar(cell);
+      }
+      cell.input.focus();
+    });
+    cell.input.addEventListener("input", () => {
+      const ch = norm(cell.input.value).slice(-1);
+      cell.input.value = ch;
+      cell.el.classList.remove("errado", "certo");
+      $("status").textContent = ""; $("status").className = "";
+      if (ch) { avancar(); verificarFim(); }
+    });
+    cell.input.addEventListener("keydown", (e) => {
+      const k = e.key;
+      if (k === "ArrowRight") { e.preventDefault(); mover(0, 1); }
+      else if (k === "ArrowLeft") { e.preventDefault(); mover(0, -1); }
+      else if (k === "ArrowDown") { e.preventDefault(); mover(1, 0); }
+      else if (k === "ArrowUp") { e.preventDefault(); mover(-1, 0); }
+      else if (k === "Backspace") {
+        e.preventDefault();
+        if (cell.input.value) limparCelula(cell); else retroceder();
+      } else if (k === "Delete") { e.preventDefault(); limparCelula(cell); }
+    });
+  });
+
+  // 6) Botões
+  function verificarFim() {
+    if (lista.every((c) => c.input.value === c.sol)) {
+      lista.forEach((c) => { c.el.classList.remove("errado"); c.el.classList.add("certo"); });
+      $("status").textContent = "🎉 Parabéns! Você completou a cruzadinha!";
+      $("status").className = "ok";
+      return true;
+    }
+    return false;
+  }
+
+  $("btn-verificar").addEventListener("click", () => {
+    let erradas = 0, vazias = 0;
+    lista.forEach((c) => {
+      const v = c.input.value;
+      c.el.classList.remove("errado", "certo");
+      if (!v) vazias++;
+      else if (v !== c.sol) { erradas++; c.el.classList.add("errado"); }
+    });
+    if (verificarFim()) return;
+    $("status").className = erradas ? "erro" : "";
+    $("status").textContent = erradas + " letra(s) errada(s) e " + vazias + " vazia(s).";
+  });
+
+  $("btn-revelar").addEventListener("click", () => {
+    lista.forEach((c) => { c.input.value = c.sol; c.el.classList.remove("errado", "certo"); });
+    $("status").textContent = ""; $("status").className = "";
+  });
+
+  $("btn-limpar").addEventListener("click", () => {
+    lista.forEach(limparCelula);
+    $("status").textContent = ""; $("status").className = "";
+  });
+
+  // 7) Erros de configuração e início
+  if (erros.length) {
+    console.error("Cruzadinha:\n" + erros.join("\n"));
+    $("status").className = "erro";
+    $("status").innerHTML = "<b>Erros na configuração:</b><br>" + erros.join("<br>");
+  }
+
+  const primeira = ordenadas[0];
+  if (primeira) selecionar(cells[primeira.keys[0]], primeira.dir, false);
+})();
+</script>
+</body>
+</html>

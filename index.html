@@ -1,0 +1,280 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arquitetura-computacional</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style-lab.css">
+</head>
+<body>
+
+  <div id="scanlines"></div>
+  <div id="vignette"></div>
+
+  <!-- ===== PORTAL DE ESCOLHA (HUB) ===== -->
+  <section id="screenHub" class="screen active">
+    <div class="hub-bg bg-mario"></div>
+    <div class="hub-content">
+      <div class="hub-kicker">PROTOCOLO INTERATIVO // ARQUITETURA COMPUTACIONAL</div>
+      <h1 id="hubTitle" class="hub-title pixel">ARQUITETURA COMPUTACIONAL: PROTOCOLO INTERATIVO</h1>
+      <p id="hubSubtitle" class="hub-subtitle">Escolha sua linha temporal e estilo de investigação para dominar os fundamentos de hardware, memória, barramentos e processamento.</p>
+      <div class="hub-cards">
+        <article class="hub-card">
+          <div class="hub-card-flag">LINHA TEMPORAL // 2087</div>
+          <h2 class="hub-card-title pixel">MANUTENÇÃO DO COMPUTADOR</h2>
+          <p class="hub-card-text">Bancada holográfica futurista. Complete a lacuna do manual e monte o hardware progressivamente com o robô assistente BYTE.</p>
+          <button id="btnEnterCyber" class="btn-cyber btn-pulse">ACESSAR OFICINA</button>
+        </article>
+        <article class="hub-card">
+          <div class="hub-card-flag">LINHA TEMPORAL // ANO DE 1953</div>
+          <h2 class="hub-card-title">O LABORATÓRIO PERDIDO</h2>
+          <p class="hub-card-text">Investigação narrativa no estilo retrofuturista atômico. Cruzadinha interligada a dossiês confidenciais do Dr. Elias Voss.</p>
+          <button id="btnEnterAtom" class="btn-atom btn-pulse">INVESTIGAR LABORATÓRIO ATOMPUNK</button>
+        </article>
+        <article class="hub-card">
+          <div class="hub-card-flag">MINIGAME // 50 FASES</div>
+          <h2 class="hub-card-title">PORTAS LÓGICAS</h2>
+          <p class="hub-card-text">Arraste portas AND, OR, NOT, XOR, NAND e NOR até as lacunas do circuito e descubra se a lâmpada acende. Do mais fácil ao mais complexo.</p>
+          <button id="btnEnterLogic" class="btn-warn btn-pulse" type="button" onclick="window.location.href='gamePortas.html'">JOGAR PORTAS LÓGICAS</button>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       JOGO 1: BYTE & THE LOST ARCHITECTURE (lógica em game.js)
+       ========================================================== -->
+  <section id="screenStart" class="screen hidden">
+    <div class="bg-scene">
+      <div class="bg-grid"></div>
+      <div class="bg-neon"></div>
+      <div class="bg-floor"></div>
+    </div>
+
+    <div class="dialog-terminal">
+      <div class="term-title">BYTE.SYS // SISTEMA DE RECOVERY</div>
+      <div id="byteDialog">
+        <p><b>Olá, montador! Temos um problema...</b></p>
+        <p>O manual de arquitetura foi corrompido! Precisamos recuperar os arquivos para concluir a montagem. Você aceita o desafio de resolver os enigmas?
+        <br><br>🖥️ Dica: Visualize em tela cheia para uma melhor experiência.</p>
+      </div>
+      <canvas id="byteCanvas" width="64" height="64"></canvas>
+    </div>
+
+    <button id="btnExitHubStart" class="btn-ghost btn-exit-top">← VOLTAR AO PORTAL</button>
+    <button id="btnStart" class="btn-neon btn-pulse">INICIAR MISSÃO</button>
+  </section>
+
+  <section id="screenTutorial" class="screen hidden">
+    <div class="modal-terminal">
+      <div class="term-title">BYTE.SYS // TUTORIAL DE RECOVERY</div>
+      <div class="tutorial-content">
+        <p>1. Leia a pista técnica e preencha a lacuna com o termo correto.</p>
+        <p>2. Cada acerto ilumina o projeto holográfico na bancada e soma +100 XP.</p>
+        <p>3. Erros não causam Game Over: geram apenas uma dica orientadora.</p>
+      </div>
+      <button id="btnStartTutorial" class="btn-neon btn-pulse">INICIAR RECUPERAÇÃO</button>
+    </div>
+  </section>
+
+  <section id="screenGame" class="screen hidden">
+
+    <header id="topbar">
+      <div class="hud-block">
+        <span class="hud-label">REGISTROS:</span>
+        <span id="regCount" class="hud-value">0</span>
+        <span class="hud-total">/ 12</span>
+      </div>
+
+      <div id="progressBar">
+        <div class="seg" data-milestone="3"></div>
+        <div class="seg" data-milestone="6"></div>
+        <div class="seg" data-milestone="9"></div>
+        <div class="seg" data-milestone="12"></div>
+      </div>
+
+      <div class="hud-block">
+        <span class="hud-label">XP:</span>
+        <span id="xpDisplay" class="hud-value xp">000</span>
+      </div>
+
+      <button id="btnExitHub" class="btn-ghost">← VOLTAR AO PORTAL</button>
+      <button id="btnManual" class="btn-ghost">MANUAL DE ARQUITETURA</button>
+    </header>
+
+    <main id="benchArea">
+      <canvas id="hologram" width="360" height="200"></canvas>
+      <div id="stageBanner">ETAPA: AGUARDANDO MANUAL</div>
+    </main>
+
+    <section id="bottomPanel">
+      <div id="challengeArea">
+        <span id="catBadge" class="cat-badge">[MEMÓRIA]</span>
+        <p id="clueText"></p>
+        <input id="answerInput" type="text" maxlength="20" placeholder="INSIRA O TERMO..." autocomplete="off" />
+        <div id="errorBox" class="error-box hidden"></div>
+      </div>
+
+      <div id="controlsArea">
+        <button id="btnCheck" class="btn-success">CONFERIR</button>
+        <button id="btnHint" class="btn-warn">SOLICITAR DICA (-15 XP)</button>
+        <div id="recordNav">
+          <button id="btnPrev" class="btn-ghost">◀ ANTERIOR</button>
+          <span id="recordLabel">REGISTRO 1/12</span>
+          <button id="btnNext" class="btn-ghost">PRÓXIMO ▶</button>
+        </div>
+      </div>
+
+      <div id="byteConsole"></div>
+    </section>
+  </section>
+
+  <section id="screenFinal" class="screen hidden">
+
+    <div id="bootScreen" class="hidden">
+      <div class="boot-lines" id="bootLines"></div>
+      <div class="boot-monitor">
+        <div class="boot-logo">B</div>
+        <div class="boot-sub">BYTE BIOS v2.6</div>
+      </div>
+    </div>
+
+    <div id="finalReport" class="hidden">
+      <div class="final-card">
+        <h1 class="final-title pixel">MISSÃO CONCLUÍDA</h1>
+        <h2 class="final-subtitle">— MANUAL RECONSTRUÍDO! —</h2>
+        <div class="final-stats">
+          <div class="stat">XP FINAL: <span id="finalXp">000</span></div>
+          <div class="stat">TENTATIVAS: <span id="finalAttempts">0</span></div>
+          <div class="stat">CLASSIFICAÇÃO: <span id="finalClass">MONTADOR APRENDIZ</span></div>
+        </div>
+        <button id="btnBoot" class="btn-neon btn-pulse">LIGAR COMPUTADOR</button>
+        <button id="btnReview" class="btn-ghost">REVISAR CONCEITOS</button>
+        <button id="btnExitHubFinal" class="btn-ghost">← VOLTAR AO PORTAL</button>
+        <button id="btnPlayAgain" class="btn-neon">JOGAR NOVAMENTE</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="manualModal" class="modal hidden">
+    <div class="modal-content">
+      <h2 class="modal-title pixel">MANUAL DE ARQUITETURA</h2>
+      <div id="manualList"></div>
+      <button id="btnCloseManual" class="btn-ghost">FECHAR</button>
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       JOGO 2: O LABORATÓRIO PERDIDO (lógica em game-lab.js)
+       ========================================================== -->
+
+  <!-- Intro + tutorial. O modal fica DENTRO da section para o CSS do lab alcançá-lo. -->
+  <section id="screenLabIntro" class="screen hidden theme-lab">
+    <div class="lab-bg"></div>
+    <div class="lab-intro-inner">
+      <div class="lab-fiche">
+        <div class="lab-fiche-title">LABORATÓRIO VOSS // SISTEMA DE ANOTAÇÕES</div>
+        <h2 class="lab-fiche-heading">O LABORATÓRIO PERDIDO</h2>
+        <div class="lab-fiche-body">
+          <p class="lab-narrative">O Dr. Elias Voss desapareceu após experimentos avançados de Arquitetura Computacional e deixou anotações corrompidas. O laboratório está em silêncio, mas os painéis ainda respiram.</p>
+          <p class="lab-narrative">Suas memórias, barramentos e processamento multinúcleo formam as peças de um enigma. Complete a cruzadinha e reconstrua os dossiês.</p>
+        </div>
+        <button id="btnLabStart" class="btn-lab-green btn-pulse">INVESTIGAR LABORATÓRIO</button>
+      </div>
+    </div>
+
+    <div id="labTutorialModal" class="modal hidden">
+      <div class="lab-fiche modal-content">
+        <div class="lab-fiche-title">FICHA TÉCNICA // PROTOCOLO DE CRUZADA</div>
+        <div class="lab-fiche-body">
+          <p class="lab-doc-text">Cada lacuna numerada no dossiê corresponde a uma palavra da cruzadinha.</p>
+          <p class="lab-doc-text">Clique em uma casa, uma dica ou uma lacuna e digite (as setas do teclado movem o cursor; clicar de novo no cruzamento troca a direção). A palavra é conferida sozinha quando você preenche a última letra.</p>
+        </div>
+        <button id="btnLabGo" class="btn-lab-green btn-pulse">INICIAR INVESTIGAÇÃO</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tela do jogo: cruzadinha à esquerda, dossiê e dicas à direita -->
+  <section id="screenLabGame" class="screen hidden theme-lab">
+    <header id="labTopbar">
+      <div class="lab-hud-block">
+        <span class="lab-hud-label">REGISTROS RECUPERADOS:</span>
+        <span id="labRegCount" class="lab-hud-value">0</span>
+        <span class="lab-hud-total">/ 12</span>
+      </div>
+      <div class="lab-hud-block">
+        <span class="lab-hud-label">TEMPO:</span>
+        <span id="labTimer" class="lab-hud-value">00:00</span>
+      </div>
+      <div class="lab-hud-block">
+        <span class="lab-hud-label">TENTATIVAS:</span>
+        <span id="labAttempts" class="lab-hud-value">0</span>
+      </div>
+      <button id="btnLabExit" class="btn-lab-ghost">← VOLTAR AO PORTAL</button>
+    </header>
+
+    <main id="labMain">
+      <section id="labCrossPanel">
+        <div id="labCurrentClue"></div>
+        <div id="labGrid"></div>
+        <div id="labActions">
+          <button id="btnLabFinalize" class="btn-lab-green btn-pulse hidden">FINALIZAR INVESTIGAÇÃO E LER DOSSIÊ FINAL</button>
+        </div>
+        <div class="lab-led"><span id="labLedDot" class="lab-led-dot"></span><span id="labLedText">STANDBY</span></div>
+      </section>
+
+      <section id="labDossierPanel">
+        <div id="labDossierTabs"></div>
+        <div id="labDossierContent"></div>
+        <div id="labFileComment" class="lab-file-comment hidden"></div>
+        <div id="labClues">
+          <div class="lab-clue-title">HORIZONTAIS</div>
+          <div id="labCluesH"></div>
+          <div class="lab-clue-title">VERTICAIS</div>
+          <div id="labCluesV"></div>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <!-- Tela final: revelação + relatório -->
+  <section id="screenLabFinal" class="screen hidden theme-lab">
+    <div class="lab-final-inner">
+      <div id="labFinalRevelation" class="lab-final-step">
+        <div class="lab-fiche">
+          <div class="lab-fiche-title">GRAVAÇÃO SECRETA // DR. ELIAS VOSS // 04:17</div>
+          <h2 class="lab-final-title">O OCULTO DO NÚCLEO</h2>
+          <p class="lab-type-text" id="labRevelationText">O núcleo experimental foi ocultado antes que caísse em mãos erradas.</p>
+          <button id="btnLabToReport" class="btn-lab-green btn-pulse">CONTINUAR PARA A AVALIAÇÃO</button>
+        </div>
+      </div>
+      <div id="labFinalReport" class="lab-final-step hidden">
+        <div class="lab-fiche">
+          <div class="lab-fiche-title">AGÊNCIA DE PESQUISA // RELATÓRIO FINAL</div>
+          <h2 class="lab-final-title">AVALIAÇÃO DA AGÊNCIA</h2>
+          <div class="lab-final-stats">
+            <div class="lab-final-stat"><span>REGISTROS DESCOBERTOS</span><strong id="labFinalFound">0/12</strong></div>
+            <div class="lab-final-stat"><span>TENTATIVAS</span><strong id="labFinalAttempts">0</strong></div>
+            <div class="lab-final-stat"><span>TEMPO TOTAL</span><strong id="labFinalTime">00:00</strong></div>
+            <div class="lab-final-stat"><span>PONTUAÇÃO FINAL</span><strong id="labFinalScore">0</strong></div>
+          </div>
+          <div id="labFinalAchievements"></div>
+          <button id="btnLabReplay" class="btn-lab-green btn-pulse">REINICIAR INVESTIGAÇÃO</button>
+          <button id="btnLabExitFinal" class="btn-lab-amber">VOLTAR AO PORTAL DE JOGOS</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- A ordem importa pouco (os arquivos são independentes), mas game.js vem primeiro -->
+  <script src="game.js"></script>
+  <script src="gameLab.js"></script>
+</body>
+</html>
